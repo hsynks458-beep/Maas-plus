@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Maaş+++</title>
+<meta name="description" content="Maaş+++, mesai, vergi dilimi hesaplayıcı. Offline PWA destekli bordro uygulaması.">
+<meta name="theme-color" content="#8b5cf6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<!-- Version kontrol - v64.90 -->
+<script src="version.js?v=64.1.2"></script>
+
+<!-- Manifest -->
+<link rel="manifest" href="manifest.json?v=64.84">
+
+<link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+
+<!-- CSS'ler dinamik -->
+<script>
+['style','tema','layout','card','takvim','modal','analiz'].forEach(function(f) {
+  document.write('<link rel="stylesheet" href="' + f + '.css?v=' + window.APP_VERSION + '">');
+});
+</script>
+</head>
+<body>
+  <!-- ŞIK SPLASH SCREEN -->
+  <div id="splashScreen" class="splash-screen">
+    <div class="splash-logo">
+      <img src="icon-512.png" alt="Maaş+++" class="splash-img">
+      <h1 class="splash-title">MAAŞ<span>+++</span></h1>
+      <div class="splash-loader">
+        <div class="loader-bar"></div>
+      </div>
+      <p class="splash-version">v<span id="splashVersion"></span></p>
+    </div>
+  </div>
+  
+  <noscript>
+    <div style="position:fixed;top:0;left:0;right:0;bottom:0;background:#0f172a;color:#f1f5f9;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;z-index:10001;">
+      <div>
+        <h2>JavaScript Gerekli</h2>
+        <p>Bu uygulamayı kullanmak için JavaScript'i etkinleştirmeniz gerekir.</p>
+      </div>
+    </div>
+  </noscript>
+  
+  <div class="app">
+    <div class="header">
+      <div class="title">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" style="margin-right:8px;flex-shrink:0;overflow:visible">
+          <rect x="5" y="3" width="14" height="18" rx="2" fill="#8b5cf6" stroke="#8b5cf6" stroke-width="1.5" />
+          <rect x="7" y="5" width="10" height="3" rx="0.5" fill="#f1f5f9" />
+          <circle cx="8.5" cy="11" r="1" fill="#f1f5f9" />
+          <circle cx="12" cy="11" r="1" fill="#f1f5f9" />
+          <circle cx="15.5" cy="11" r="1" fill="#f1f5f9" />
+          <circle cx="8.5" cy="14.5" r="1" fill="#f1f5f9" />
+          <circle cx="12" cy="14.5" r="1" fill="#f1f5f9" />
+          <circle cx="15.5" cy="14.5" r="1" fill="#f1f5f9" />
+          <circle cx="17.5" cy="17.5" r="3" fill="#10b981" stroke="#0f172a" stroke-width="1" />
+          <path d="M17.5 16v3M16 17.5h3" stroke="#0f172a" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
+        MAAŞ+++
+      </div>
+      <button class="icon-btn" onclick="temaDegistir()" aria-label="Temayı değiştir">🌙</button>
+    </div>
+
+<div class="tabs">
+<button class="tab active" onclick="sekmeDegistir(0)" aria-label="Hesap sekmesi">
+<svg class="tab-icon" style="color:#8b5cf6" viewBox="0 0 24 24">
+<text x="12" y="18" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="20" font-weight="700" fill="currentColor" text-anchor="middle">₺</text>
+</svg>
+Hesap
+</button>
+<button class="tab" onclick="sekmeDegistir(1)" aria-label="Bordro sekmesi">
+<svg class="tab-icon" style="color:#10b981" fill="currentColor" viewBox="0 0 24 24">
+  <path d="M6 2c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6H6zm7 7V3.5L18.5 9H13zM8 14h8v2H8v-2zm0 4h8v2H8v-2z"/>
+</svg>
+Bordro
+</button>
+<button class="tab" id="takvimBtn" onclick="sekmeDegistir(2)" aria-label="Takvim sekmesi">
+  <svg class="tab-icon" style="color:#f59e0b" viewBox="0 0 24 24">
+    <rect x="4" y="5" width="16" height="16" rx="1" fill="currentColor" opacity="0.2" />
+    <rect x="3" y="4" width="16" height="16" rx="1" fill="var(--kart)" stroke="currentColor" stroke-width="2" />
+    <circle cx="7" cy="4" r="1" fill="currentColor" />
+    <circle cx="15" cy="4" r="1" fill="currentColor" />
+    <text x="11" y="16" font-family="system-ui" font-size="10" font-weight="800" fill="currentColor" text-anchor="middle" id="gun-text">28</text>
+  </svg>
+  Takvim
+</button>
+<button class="tab" onclick="sekmeDegistir(3)" aria-label="Kümülatif sekmesi">
+<svg class="tab-icon" style="color:#ec4899" fill="currentColor" viewBox="0 0 24 24">
+<path d="M5 9.2h3V19H5V9.2zM10.6 5h2.8v14h-2.8V5zm5.6 8H19v6h-2.8v-6z"/>
+</svg>
+Kümülatif
+</button>
+<button class="tab" onclick="sekmeDegistir(4)" aria-label="Analiz sekmesi">
+<svg class="tab-icon" style="color:#06b6d4" fill="currentColor" viewBox="0 0 24 24">
+<path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
+</svg>
+Analiz
+</button>
+</div>
+
+<div class="content">
+<div class="pages">
+<!-- PAGE HESAP -->
+<div class="page" id="page-hesap">
+  <div class="card">
+    <div class="card-header" onclick="akordiyonAc(this)">
+      <div class="card-title">
+        <svg class="card-icon" style="color:#8b5cf6" viewBox="0 0 24 24" style="overflow:visible">
+        <text x="12" y="18" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="20" font-weight="700" fill="currentColor" text-anchor="middle">₺</text>
+        </svg>
+        Ücret Bilgileri
+      </div>
+      <svg class="chevron" fill="currentColor" viewBox="0 0 24 24" style="transform: rotate(180deg)"><path d="M7 10l5 5 5-5z"/></svg>
+    </div>
+    <div class="card-body" style="max-height: none; padding: 0 16px 16px;">
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Saatlik Ücret</label>
+          <input type="text" class="form-input" id="saatlikUcret" inputmode="decimal" placeholder="₺ Saatlik ücret gir">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Aylık Brüt Sabit</label>
+          <input type="text" class="form-input" id="brutUcret" value="0,00" readonly>
+        </div>
+        <div class="form-group">
+          <label class="form-label">İkramiye</label>
+          <input type="text" class="form-input" id="ikramiye" value="0,00" readonly>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Avans</label>
+          <input type="text" class="form-input" id="avans" value="0,00" readonly>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Toplam Brüt</label>
+          <input type="text" class="form-input" id="toplamBrutGoster" value="0,00" readonly style="font-weight:700;color:var(--vurgu)">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ay Sonu</label>
+          <input type="text" class="form-input" id="aySonuGoster" value="0,00" readonly style="font-weight:700;color:var(--basarili)">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Diğer kartlar aynı kalıyor -->
+
+  <div class="card">
+    <div class="card-header" onclick="akordiyonAc(this)">
+      <div class="card-title">
+        <svg class="card-icon" style="color:#10b981" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M8 12h8"/>
+          <path d="M12 8v8"/>
+        </svg>
+        Ek Ödemeler
+      </div>
+      <svg class="chevron" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+    </div>
+    <div class="card-body">
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Yakacak Yardımı</label>
+          <input type="text" class="form-input" id="yakacak" inputmode="decimal" placeholder="0,00">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Çocuk Yardımı</label>
+          <input type="text" class="form-input" id="cocuk" inputmode="decimal" placeholder="0,00">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Alışveriş Çeki</label>
+          <input type="text" class="form-input" id="a101Ceki" inputmode="decimal" placeholder="0,00">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Yıllık İzin Harçlığı</label>
+          <input type="text" class="form-input" id="yillikIzinHarclik" inputmode="decimal" placeholder="0,00">
+        </div>
+      </div>
+    </div>
+  </div>
+    <div class="card">
+    <div class="card-header" onclick="akordiyonAc(this)">
+      <div class="card-title">
+        <svg class="card-icon" style="color:#8b5cf6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        Mesai Bilgileri
+      </div>
+      <svg class="chevron" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+    </div>
+    <div class="card-body">
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Mesai İçi Saat</label>
+          <input type="text" class="form-input" id="mesaiHici" inputmode="decimal" placeholder="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Gece Vardiya Saat</label>
+          <input type="text" class="form-input" id="geceVardiya" inputmode="decimal" placeholder="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Hafta İçi Mesai %</label>
+          <select class="form-select" id="mesaiHiciOran">
+            <option value="1.7">%70</option>
+            <option value="1.8">%80</option>
+            <option value="1.9">%90</option>
+            <option value="2.0" selected>%100</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Hafta Sonu Mesai %</label>
+          <select class="form-select" id="mesaiHsonuOran">
+            <option value="2.0" selected>%100</option>
+            <option value="2.1">%110</option>
+            <option value="2.2">%120</option>
+            <option value="2.25">%125</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="akordiyonAc(this)">
+      <div class="card-title">
+        <svg class="card-icon" style="color:#ef4444" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M8 12h8"/>
+        </svg>
+        Kesintiler
+      </div>
+      <svg class="chevron" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+    </div>
+    <div class="card-body">
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Sendika</label>
+          <div class="radio-group">
+            <label class="radio-label"><input type="radio" name="sendikaVar" value="1"><span>Evet</span></label>
+            <label class="radio-label"><input type="radio" name="sendikaVar" value="0" checked><span>Hayır</span></label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Sendika Aidat</label>
+          <input type="text" class="form-input" id="sendikaAidat" value="0,00" readonly>
+        </div>
+        <div class="form-group">
+          <label class="form-label">BES</label>
+          <div class="radio-group">
+            <label class="radio-label"><input type="radio" name="besVar" value="1"><span>Evet</span></label>
+            <label class="radio-label"><input type="radio" name="besVar" value="0" checked><span>Hayır</span></label>
+          </div>
+        </div>
+        <div class="form-group" id="besTutarGrup" style="display:none">
+          <label class="form-label">BES Tutarı</label>
+          <input type="text" class="form-input" id="besTutar" inputmode="decimal" placeholder="0,00">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Personel Borcu</label>
+          <div class="radio-group">
+            <label class="radio-label"><input type="radio" name="borcVar" value="1"><span>Evet</span></label>
+            <label class="radio-label"><input type="radio" name="borcVar" value="0" checked><span>Hayır</span></label>
+          </div>
+        </div>
+        <div class="form-group" id="borcGrup" style="display:none">
+          <label class="form-label">Toplam Borç Tutarı</label>
+          <input type="text" class="form-input" id="borcToplam" inputmode="decimal" placeholder="0,00">
+        </div>
+        <div class="form-group" id="borcBaslangicGrup" style="display:none">
+          <label class="form-label">P.Borcu Başlangıç Ayı</label>
+          <input type="month" class="form-input" id="borcBaslangicAy">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE BORDRO -->
+<div class="page" id="page-bordro">
+  <div class="result-card" id="sonucKart">
+    <div class="result-label">Net Ödenecek</div>
+    <div class="result-value" id="netOdenecek">0,00 ₺</div>
+    <div class="result-row">
+      <span>Avans</span><span id="avansGoster">0,00 ₺</span>
+    </div>
+    <div class="result-row highlight">
+      <span>Ay Sonu</span><span id="aySonu">0,00 ₺</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="akordiyonAc(this)">
+      <div class="card-title">
+        <svg class="card-icon" style="color:#8b5cf6" fill="currentColor" viewBox="0 0 24 24" style="overflow:visible"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+        Kazanç Detayı
+      </div>
+      <svg class="chevron" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+    </div>
+    <div class="card-body">
+      <div id="kazancDetay"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="akordiyonAc(this)">
+      <div class="card-title">
+        <svg class="card-icon" style="color:#ef4444" fill="currentColor" viewBox="0 0 24 24" style="overflow:visible"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+        Kesinti Detayı
+      </div>
+      <svg class="chevron" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+    </div>
+    <div class="card-body">
+      <div id="kesintiDetay"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE TAKVIM -->
+<div class="page" id="page-takvim">
+  <div class="card">
+    <div class="takvim-nav">
+      <button class="nav-btn" onclick="ayDegistir(-1)" aria-label="Önceki ay">‹</button>
+      <div class="takvim-ay" id="takvimAy">Ocak 2026</div>
+      <button class="nav-btn" onclick="ayDegistir(1)" aria-label="Sonraki ay">›</button>
+    </div>
+    <div class="takvim-grid" id="takvimGrid"></div>
+    <div class="takvim-alt-butonlar">
+      <button class="btn-ghost" style="color: var(--hata)" onclick="ayiTemizle()">
+        <svg class="icon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M3 6h18"/>
+          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+        </svg>
+        AYI TEMİZLE
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE KUMULATIF -->
+<div class="page" id="page-kumulatif">
+  <div class="result-card" id="kumulatifKart">
+    <div class="result-label">Yıllık Kümülatif Brüt</div>
+    <div class="result-value" id="kumulatifBrut">0,00 ₺</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="akordiyonAc(this)">
+      <div class="card-title">
+        <svg class="card-icon" style="color:#8b5cf6" fill="currentColor" viewBox="0 0 24 24" style="overflow:visible"><path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.89-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+        Manuel Brüt Giriş
+      </div>
+      <svg class="chevron" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+    </div>
+    <div class="card-body">
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Ay Seç</label>
+          <select class="form-select" id="manuelAy">
+            <option value="1">Ocak</option>
+            <option value="2">Şubat</option>
+            <option value="3">Mart</option>
+            <option value="4">Nisan</option>
+            <option value="5" selected>Mayıs</option>
+            <option value="6">Haziran</option>
+            <option value="7">Temmuz</option>
+            <option value="8">Ağustos</option>
+            <option value="9">Eylül</option>
+            <option value="10">Ekim</option>
+            <option value="11">Kasım</option>
+            <option value="12">Aralık</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Brüt Gir</label>
+          <input type="text" class="form-input" id="manuelBrut" inputmode="decimal" placeholder="0,00">
+        </div>
+        <div class="form-group">
+          <label class="form-label">GV Matrahı (opsiyonel)</label>
+          <input type="text" class="form-input" id="manuelMatrah" inputmode="decimal" placeholder="Boş bırakılırsa Brüt×%85 alınır">
+        </div>
+        <button class="btn-secondary" onclick="manuelBrutEkle()">➕ Brüt Ekle</button>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header" onclick="akordiyonAc(this)">
+      <div class="card-title">
+        <svg class="card-icon" style="color:#8b5cf6" fill="currentColor" viewBox="0 0 24 24"><path d="M3 5h18v2H3V5zm0 6h18v2H3v-2zm0 6h18v2H3v-2z"/></svg>
+        Toplu Giriş (Hızlı)
+      </div>
+      <svg class="chevron" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+    </div>
+    <div class="card-body">
+      <div class="form-group">
+        <label class="form-label">Her satıra: Ay Brüt Matrah(opsiyonel)</label>
+        <textarea class="form-input" id="topluGirisMetin" rows="6" placeholder="Ocak 40000 30000
+Şubat 42000
+Mart 45000 34000"></textarea>
+      </div>
+      <button class="btn-secondary" onclick="topluGirisKaydet()">📋 Hepsini Kaydet</button>
+    </div>
+  </div>
+    <div class="card">
+    <div class="card-header" onclick="akordiyonAc(this)">
+      <div class="card-title">
+        <svg class="card-icon" style="color:#10b981" fill="currentColor" viewBox="0 0 24 24" style="overflow:visible">
+        <path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2zm-4 8H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V7h2v2zm8 8h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+        </svg>
+        Bu Ay Matrahlar
+      </div>
+      <svg class="chevron" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+    </div>
+    <div class="card-body">
+      <div class="data-row"><span>SGK Matrahı</span><span id="matrahSgk">0,00 ₺</span></div>
+      <div class="data-row"><span>Gelir V. Matrahı</span><span id="matrahGv">0,00 ₺</span></div>
+      <div class="data-row"><span>Damga V. Matrahı</span><span id="matrahDv">0,00 ₺</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="akordiyonAc(this)">
+      <div class="card-title">
+        <svg class="card-icon" style="color:#f59e0b" viewBox="0 0 24 24" style="overflow:visible">
+        <text x="12" y="18" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="20" font-weight="700" fill="currentColor" text-anchor="middle">₺</text>
+        </svg>
+        Vergi Dilimi Takibi
+      </div>
+      <svg class="chevron" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+    </div>
+    <div class="card-body">
+      <div class="data-row"><span>Bulunduğun Dilim</span><span id="vergiDilim">%15</span></div>
+      <div class="data-row"><span>Kümülatif GV Matrahı</span><span id="kumulatifGvMatrah">0,00 ₺</span></div>
+      <div class="data-row"><span>Ödenen Gelir Vergisi</span><span id="kumulatifGv">0,00 ₺</span></div>
+      <div class="data-row"><span>Sonraki Dilime Kalan</span><span id="dilimKalan">0,00 ₺</span></div>
+      <div class="data-row total"><span>Durum</span><span id="dilimAy">-</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="akordiyonAc(this)">
+      <div class="card-title">
+        <svg class="card-icon" style="color:#ef4444" fill="currentColor" viewBox="0 0 24 24" style="overflow:visible"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+        Aylık Döküm
+      </div>
+      <svg class="chevron" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+    </div>
+    <div class="card-body">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span style="font-size:14px;color:var(--metin2)">Aylık Brütler</span>
+        <button class="btn-secondary" onclick="kumulatifTemizle()" style="padding:6px 12px;font-size:12px" aria-label="Tüm aylık brütleri temizle">🗑 Tümünü Temizle</button>
+      </div>
+      <div id="aylikDokum"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="akordiyonAc(this)">
+      <div class="card-title">Uyarılar</div>
+      <svg class="chevron" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+    </div>
+    <div class="card-body">
+      <div id="kumulatifUyari" style="font-size:14px;line-height:1.6"></div>
+    </div>
+  </div>
+
+  <div style="margin-top:16px;padding:0 4px;margin-bottom:16px">
+    <button class="btn-danger" onclick="herSeyiSifirla()" aria-label="Tüm verileri sıfırla">🔄 Tüm Verileri Sıfırla</button>
+  </div>
+</div>
+
+<!-- PAGE ANALIZ -->
+<div class="page" id="page-analiz">
+  <div class="result-card">
+    <div class="result-label">Bu Ay vs Yıl Ortalaması</div>
+    <div class="result-value" id="analizFark">0,00 ₺</div>
+    <div class="result-row">
+      <span>Bu Ay Toplam Brüt</span><span id="analizBuAy">0,00 ₺</span>
+    </div>
+    <div class="result-row">
+      <span>Yıl Ortalaması</span><span id="analizOrtalama">0,00 ₺</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="akordiyonAc(this)">
+      <div class="card-title">
+        <svg class="card-icon" style="color:#8b5cf6" fill="currentColor" viewBox="0 0 24 24" style="overflow:visible">
+        <path d="M5 9.2h3V19H5V9.2zM10.6 5h2.8v14h-2.8V5zm5.6 8H19v6h-2.8v-6z"/>
+        </svg>
+        Yıllık Brüt Grafiği
+      </div>
+      <svg class="chevron" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+    </div>
+    <div class="card-body">
+      <div class="grafik-container">
+        <div class="grafik-baslik">Aylık Brüt Karşılaştırma</div>
+        <canvas id="brutGrafik" width="400" height="350"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="akordiyonAc(this)">
+      <div class="card-title">
+        <svg class="card-icon" style="color:#10b981" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="overflow:visible">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        Mesai Karşılaştırma
+      </div>
+      <svg class="chevron" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+    </div>
+    <div class="card-body">
+      <div class="data-row"><span>Bu Ay Mesai İçi</span><span id="analizMesaiHici">0 saat</span></div>
+      <div class="data-row"><span>Ortalama Mesai İçi</span><span id="analizMesaiHiciOrt">0 saat</span></div>
+      <div class="data-row"><span>Bu Ay Gece Vardiya</span><span id="analizGece">0 saat</span></div>
+      <div class="data-row"><span>Ortalama Gece</span><span id="analizGeceOrt">0 saat</span></div>
+      <div class="data-row"><span>Bu Ay Gündüz Vardiya</span><span id="analizGunduz">0 saat</span></div>
+      <div class="data-row"><span>Ortalama Gündüz</span><span id="analizGunduzOrt">0 saat</span></div>
+      <div class="data-row"><span>Toplam Mesai</span><span id="analizMesai">0 saat</span></div>
+      <div class="data-row"><span>Resmi Tatil Mesaisi</span><span id="analizResmiTatil">0 saat</span></div>
+      <div class="data-row"><span>Hafta Tatili Mesaisi</span><span id="analizHaftaTatili">0 saat</span></div>
+      <div class="data-row"><span>Toplam Çalışma Günü</span><span id="analizCalismaGunu">0 gün</span></div>
+      <div class="data-row"><span>Kesinti Günü</span><span id="analizKesintiGunu">0 gün</span></div>
+      <div class="data-row"><span>İzinli Gün</span><span id="analizIzinliGun">0 gün</span></div>
+      <div class="data-row"><span>Raporlu Gün</span><span id="analizRaporluGun">0 gün</span></div>
+      <div class="data-row"><span>Kümülatif Vergi Matrahı</span><span id="analizKumulatif">0,00 ₺</span></div>
+      <div class="data-row total"><span>Mesai Geliri Farkı</span><span id="analizMesaiFark">0,00 ₺</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="akordiyonAc(this)">
+      <div class="card-title">
+        <svg class="card-icon" style="color:#10b981" viewBox="0 0 24 24" style="overflow:visible">
+        <text x="12" y="18" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="20" font-weight="700" fill="currentColor" text-anchor="middle">₺</text>
+        </svg>
+        Kazanç Özeti
+      </div>
+      <svg class="chevron" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+    </div>
+    <div class="card-body">
+      <div class="data-row"><span>Bu Ay Brüt</span><span id="analizBrut">0,00 ₺</span></div>
+      <div class="data-row"><span>Yıl Ortalama Brüt</span><span id="analizBrutOrt">0,00 ₺</span></div>
+      <div class="data-row"><span>Bu Ay Net</span><span id="analizNet">0,00 ₺</span></div>
+      <div class="data-row"><span>Yıl Ortalama Net</span><span id="analizNetOrt">0,00 ₺</span></div>
+      <div class="data-row"><span>En Yüksek Ay</span><span id="analizEnYuksek">-</span></div>
+      <div class="data-row"><span>En Düşük Ay</span><span id="analizEnDusuk">-</span></div>
+      <div class="data-row total"><span>Yıl Toplam Net</span><span id="analizYilToplam">0,00 ₺</span></div>
+    </div>
+  </div>
+    <div class="card">
+    <div class="card-header" onclick="akordiyonAc(this)">
+      <div class="card-title">
+       <svg class="card-icon" style="color:#10b981" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M8 12h8"/>
+          <path d="M12 8v8"/>
+        </svg>
+        Ek Ödeme Analizi
+      </div>
+      <svg class="chevron" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+    </div>
+    <div class="card-body">
+      <div id="analizEkOdemeler"></div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- Sabit Hesapla Butonu -->
+<button class="btn-hesapla-sabit" id="sabitHesapla" onclick="hesapla()">
+<svg class="btn-icon" fill="currentColor" viewBox="0 0 24 24">
+  <path d="M7 2v11h3v9l7-12h-4l4-8z"/>
+</svg>
+  Hesapla
+</button>
+
+</div>
+
+<!-- Puantaj Seçim Modalı -->
+<div class="modal" id="modal" onclick="modalKapat(event)">
+<div class="modal-content">
+<div class="modal-header" id="modalBaslik">
+  <span></span>
+  <button class="modal-close" onclick="modalKapat(event)" aria-label="Kapat">
+    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24">
+      <path d="M18 6L6 18M6 6l12 12"/>
+    </svg>
+  </button>
+</div>
+<div class="modal-body" id="modalSecimler"></div>
+</div>
+</div>
+
+<!-- Yardım Modalı -->
+<div class="modal" id="yardimModal" onclick="yardimKapat(event)">
+<div class="modal-content" style="max-width:400px">
+<div class="modal-header" id="yardimBaslik">
+  <span>Yardım</span>
+  <button class="modal-close" onclick="yardimKapat(event)" aria-label="Kapat">
+    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24">
+      <path d="M18 6L6 18M6 6l12 12"/>
+    </svg>
+  </button>
+</div>
+<div class="modal-body" style="font-size:14px;line-height:1.7;color:var(--metin2)" id="yardimIcerik"></div>
+</div>
+</div>
+
+<!-- JS'ler dinamik -->
+<script>
+  ['main', 'avans', 'hesap', 'bordro', 'takvim', 'kumulatif', 'analiz'].forEach(function(f) {
+    var script = document.createElement('script');
+    script.src = f + '.js?v=' + window.APP_VERSION;
+    script.async = false; // Sıralı yükleme
+    document.body.appendChild(script);
+  });
+</script>
+
+<script>
+// Tüm scriptler yüklenince çalışsın
+window.addEventListener('load', function() {
+  if (typeof takvimOlustur === 'function') {
+    takvimOlustur();
+  }
+});
+</script>
+</body>
+</html>

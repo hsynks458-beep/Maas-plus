@@ -1,0 +1,187 @@
+/* ==========================================
+   MODAL.CSS - v64.88 - Kırmızı X + iOS Scroll
+   ========================================== */
+
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.75);
+  z-index: 1002;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.modal.aktif {
+  display: flex;
+  opacity: 1;
+}
+
+.modal-content {
+  background: var(--kart);
+  border-radius: 16px;
+  max-width: 360px;
+  width: 100%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .5);
+  border: 1px solid var(--kenar);
+  position: relative;
+  transform: scale(0.9);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.modal.aktif .modal-content {
+  transform: scale(1);
+}
+
+.modal-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--kenar);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--metin);
+  position: relative;
+  padding-right: 56px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+}
+
+.modal-header span {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* DÜZELTME: Kapat butonu - KIRMIZI X */
+.modal-close {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 8px;
+  border: none;
+  background: var(--arkaplan);
+  color: #ef4444; /* DÜZELTME: Kırmızı */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  padding: 0;
+  overflow: visible;
+  flex-shrink: 0;
+}
+
+.modal-close:hover {
+  background: rgba(239, 68, 68, 0.15); /* DÜZELTME: Kırmızı hover */
+  color: #dc2626;
+}
+
+.modal-close:active {
+  transform: translateY(-50%) scale(0.9);
+}
+
+.modal-close svg {
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+  overflow: visible;
+  display: block;
+  stroke-width: 2.5;
+}
+
+.modal-body {
+  padding: 16px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  max-height: calc(85vh - 52px);
+  scrollbar-width: none;
+  flex: 1;
+}
+
+.modal-body::-webkit-scrollbar {
+  display: none;
+}
+
+.modal-btn {
+  width: 100%;
+  padding: 13px 16px;
+  margin-bottom: 10px;
+  background: var(--arkaplan);
+  border: 1px solid var(--kenar);
+  border-radius: 8px;
+  color: var(--metin);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease, border-color 0.2s ease;
+}
+
+.modal-btn:last-child {
+  margin-bottom: 0;
+}
+
+@media (hover: hover) {
+  .modal-btn:hover {
+    border-color: var(--vurgu);
+    background: var(--kart);
+  }
+}
+
+.modal-btn:active {
+  background: var(--kenar);
+  transform: scale(.98);
+}
+
+.uyari-kutu {
+  padding: 14px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  border-left: 4px solid;
+}
+
+.uyari-kutu:last-child {
+  margin-bottom: 0;
+}
+
+.uyari-kutu.yesil {
+  background: rgba(16, 185, 129, .12);
+  border-color: var(--basarili);
+  color: var(--basarili);
+}
+
+.uyari-kutu.sari {
+  background: rgba(245, 158, 11, .12);
+  border-color: var(--uyari);
+  color: var(--uyari);
+}
+
+.uyari-kutu.kirmizi {
+  background: rgba(239, 68, 68, .12);
+  border-color: var(--hata);
+  color: var(--hata);
+}
+
+body.modal-acik {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}

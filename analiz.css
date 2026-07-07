@@ -1,0 +1,158 @@
+/* Analiz v64.31 - Parlak Göstergeler ve Grafik */
+
+.analiz-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.analiz-kart {
+  background: var(--kart);
+  border: 1px solid var(--kenar);
+  border-radius: 16px;
+  padding: 16px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.analiz-kart.parlak {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(236, 72, 153, 0.1));
+  border: 2px solid rgba(139, 92, 246, 0.4);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2),
+              0 0 0 1px rgba(139, 92, 246, 0.1) inset;
+}
+
+.analiz-kart.parlak:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4),
+              0 0 0 1px rgba(139, 92, 246, 0.3) inset;
+  border-color: rgba(139, 92, 246, 0.6);
+}
+
+.analiz-baslik {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--metin2);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.analiz-deger {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--metin);
+  text-shadow: 0 2px 12px rgba(139, 92, 246, 0.4);
+  line-height: 1.2;
+}
+
+.analiz-kart.parlak .analiz-deger {
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Grafik container */
+.grafik-container {
+  background: var(--kart);
+  border: 1px solid var(--kenar);
+  border-radius: 16px;
+  padding: 20px 16px 16px;
+  margin-top: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] .grafik-container {
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.grafik-baslik {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--metin);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.grafik-baslik::before {
+  content: '📊';
+  font-size: 20px;
+}
+
+#brutGrafik {
+  width: 100% !important;
+  max-height: 400px;
+  height: 350px !important;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Light tema düzeltmeleri */
+[data-theme="light"] .analiz-kart.parlak {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(219, 39, 119, 0.08));
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.15);
+  border-color: rgba(124, 58, 237, 0.3);
+}
+
+[data-theme="light"] .analiz-kart.parlak:hover {
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.25);
+  border-color: rgba(124, 58, 237, 0.5);
+}
+
+[data-theme="light"] .analiz-deger {
+  text-shadow: 0 2px 8px rgba(124, 58, 237, 0.2);
+}
+
+/* Ek ödemeler tablosu */
+#analizEkOdemeler {
+  background: var(--kart);
+  border: 1px solid var(--kenar);
+  border-radius: 16px;
+  padding: 16px;
+  margin-top: 20px;
+}
+
+#analizEkOdemeler .data-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--kenar);
+}
+
+#analizEkOdemeler .data-row:last-child {
+  border-bottom: none;
+}
+
+#analizEkOdemeler .data-row span:first-child {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--metin2);
+}
+
+#analizEkOdemeler .data-row span:last-child {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--metin);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .analiz-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  
+  .analiz-deger {
+    font-size: 20px;
+  }
+  
+  #brutGrafik {
+    height: 300px !important;
+  }
+}

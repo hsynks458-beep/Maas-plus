@@ -1,0 +1,67 @@
+{
+  "id": "maas-hesaplayici-v64",
+  "name": "Maaş Hesaplayıcı",
+  "short_name": "Maaş Hesap",
+  "description": "Maaş, mesai, vergi dilimi hesaplayıcı. Offline PWA destekli bordro uygulaması",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "background_color": "#0f172a",
+  "theme_color": "#8b5cf6",
+  "orientation": "portrait-primary",
+  "categories": ["finance", "productivity", "utilities"],
+  "lang": "tr",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "icon-32.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot-1.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Hesap ekranı"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Bordro İndir",
+      "short_name": "Bordro",
+      "description": "Son hesaplanan bordroyu PDF indir",
+      "url": "./index.html?tab=1",
+      "icons": [{"src": "icon-192.png", "sizes": "192x192"}]
+    },
+    {
+      "name": "Analiz Gör",
+      "short_name": "Analiz",
+      "description": "Bu ay vs ortalama karşılaştırma",
+      "url": "./index.html?tab=4",
+      "icons": [{"src": "icon-192.png", "sizes": "192x192"}]
+    }
+  ]
+}
