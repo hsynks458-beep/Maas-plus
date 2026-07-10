@@ -384,6 +384,16 @@ function hesapla(){
     }
   }
 
+  // Önceki ayın son günü de raporlu mu? (Bu ayın 1. günü raporsa, bu raporun
+  // önceki aydan DEVAM ettiği ve "ilk 2 gün işveren öder" hakkının önceki ayda
+  // zaten kullanılmış olduğu anlamına gelir — bu ayda tekrar sayılmamalı.)
+  var oncekiAy = ay - 1, oncekiYil = yil;
+  if(oncekiAy < 0){ oncekiAy = 11; oncekiYil = yil - 1; }
+  var oncekiKey = oncekiYil + '-' + (oncekiAy + 1);
+  var oncekiAyTakvim = window.takvimData?.[oncekiKey] || {};
+  var oncekiAySonGun = new Date(oncekiYil, oncekiAy + 1, 0).getDate();
+  var oncekiAySonGunRaporMu = oncekiAyTakvim[oncekiAySonGun] === 'rapor';
+
   var raporOdenenGun=0;
   var raporKesilenGun=0;
   var raporAvansKesinti=0;
@@ -391,22 +401,28 @@ function hesapla(){
   raporBloklari.forEach(function(blok){
     toplamRaporGun += blok.bitis - blok.baslangic + 1;
   });
-  if(toplamRaporGun >= 3){
-    raporOdenenGun = 2;
-  } else {
-    raporOdenenGun = 0;
-  }
-  raporKesilenGun = toplamRaporGun - raporOdenenGun;
-  var gunSayac = 0;
+  // HER BLOK için ayrı ayrı belirlenir (bloklar birbirini etkilemez):
+  //  - Blok önceki aydan DEVAM ediyorsa (1. günden başlıyor ve önceki ayın son
+  //    günü de raporluysa): işveren ödemesi hakkı zaten kullanılmış, 0 gün ödenir.
+  //  - Blok 3 günden kısaysa (1 veya 2 gün): TÜM günler kesilir (ödenen gün yok)
+  //  - Blok 3 gün ve üzeriyse: ilk 2 gün ödenir (kesilmez), 3. günden itibaren kesilir
+  // Örnek: 1 gün->1 gün kesinti, 2 gün->2 gün kesinti, 3 gün->1 gün kesinti, 4 gün->2 gün kesinti
   raporBloklari.forEach(function(blok){
+    var blokUzunluk = blok.bitis - blok.baslangic + 1;
+    var devamEden = (blok.baslangic === 1 && oncekiAySonGunRaporMu);
+    var odenenGunSayisi = devamEden? 0 : (blokUzunluk >= 3? 2 : 0);
+    raporOdenenGun += odenenGunSayisi;
+    var sayac = 0;
     for(var g=blok.baslangic; g<=blok.bitis; g++){
-      gunSayac++;
-      if(gunSayac > 2 && g <= kesimTarihi){
+      sayac++;
+      if(sayac > odenenGunSayisi && g <= kesimTarihi){
         raporAvansKesinti += saatlik*7.5*0.80;
       }
+
     }
   });
   raporAvansKesinti = Math.round(raporAvansKesinti/5)*5;
+  raporKesilenGun = toplamRaporGun - raporOdenenGun;
   var raporTutar=raporOdenenGun*7.5*saatlik;
 
   var toplamUcretsizIzinSaat = toplamUcretsizIzinSaatTakvim;
@@ -626,7 +642,7 @@ if (a101CekiGiris > 0) {
   if (yillikIzinTutar > 0) kazancHtml += '<div class="data-row"><span>Yıllık İzin (' + (yillikGun * 7.5).toFixed(1) + ' Saat)</span><span>' + formatla(yillikIzinTutar) + '</span></div>';
   if (resmiCalismaTutar > 0) kazancHtml += '<div class="data-row"><span>Resmi Tatil Çalışma (' + (resmiCalismaGun * 7.5).toFixed(1) + ' Saat x3)</span><span>' + formatla(resmiCalismaTutar) + '</span></div>';
   if (mesaiHaftasonuTutar > 0) kazancHtml += '<div class="data-row"><span>Mesai Hafta Sonu (' + (mesaiHaftasonuGun * 7.5).toFixed(1) + ' Saat x' + mesaiHsonuOran + ')</span><span>' + formatla(mesaiHaftasonuTutar) + '</span></div>';
-  if (raporTutar > 0) kazancHtml += '<div class="data-row"><span>Rapor (Toplam ' + toplamRaporGun + ' Gün, Ödenen ' + raporOdenenGun + ' Gün)</span><span>' + formatla(raporTutar) + '</span></div>';
+  if (toplamRaporGun > 0) kazancHtml += '<div class="data-row"><span>Rapor (Toplam ' + toplamRaporGun + ' Gün, Ödenen ' + raporOdenenGun + ' Gün)</span><span>' + formatla(raporTutar) + '</span></div>';
   kazancHtml += '<div class="data-row"><span>İkramiye</span><span>' + formatla(ikramiye) + '</span></div>';
   if (mesaiHiciTutar > 0) kazancHtml += '<div class="data-row"><span>Mesai İçi (' + mesaiHici + ' Saat x%' + ((mesaiHiciOran - 1) * 100).toFixed(0) + ')</span><span>' + formatla(mesaiHiciTutar) + '</span></div>';
   if (geceVardiyaTutar > 0) kazancHtml += '<div class="data-row"><span>Gece Vardiya (' + geceVardiya + ' Saat x%10)</span><span>' + formatla(geceVardiyaTutar) + '</span></div>';

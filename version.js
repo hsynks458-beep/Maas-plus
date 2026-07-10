@@ -2,7 +2,7 @@
 // VERSION.JS - v64.84 - SW Güncelleme Kontrolü Şık Modal
 // ==========================================
 
-window.APP_VERSION = '64.5.57';
+window.APP_VERSION = '64.5.60';
 window.APP_CACHE_NAME = 'maas-hesap-v' + window.APP_VERSION;
 
 // Versiyonu HTML title'a yaz
