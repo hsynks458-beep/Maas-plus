@@ -342,8 +342,9 @@ function hesapla(){
       else if(buAyResmi.indexOf(g)!==-1)tip='resmi-bos';
       else tip='calisma';
     }
-    if(tip==='rapor'){
-      if(!mevcutBlok)mevcutBlok={baslangic:g,bitis:g};
+    if(tip==='rapor' || tip==='rapor-yeni'){
+      var buGunZorlaYeni = (tip==='rapor-yeni');
+      if(!mevcutBlok)mevcutBlok={baslangic:g,bitis:g,zorlaYeni:buGunZorlaYeni};
       else mevcutBlok.bitis=g;
     }else{
       if(mevcutBlok){
@@ -392,7 +393,8 @@ function hesapla(){
   var oncekiKey = oncekiYil + '-' + (oncekiAy + 1);
   var oncekiAyTakvim = window.takvimData?.[oncekiKey] || {};
   var oncekiAySonGun = new Date(oncekiYil, oncekiAy + 1, 0).getDate();
-  var oncekiAySonGunRaporMu = oncekiAyTakvim[oncekiAySonGun] === 'rapor';
+  var oncekiAySonGunTip = oncekiAyTakvim[oncekiAySonGun];
+  var oncekiAySonGunRaporMu = oncekiAySonGunTip === 'rapor' || oncekiAySonGunTip === 'rapor-yeni';
 
   var raporOdenenGun=0;
   var raporKesilenGun=0;
@@ -409,7 +411,7 @@ function hesapla(){
   // Örnek: 1 gün->1 gün kesinti, 2 gün->2 gün kesinti, 3 gün->1 gün kesinti, 4 gün->2 gün kesinti
   raporBloklari.forEach(function(blok){
     var blokUzunluk = blok.bitis - blok.baslangic + 1;
-    var devamEden = (blok.baslangic === 1 && oncekiAySonGunRaporMu);
+    var devamEden = !blok.zorlaYeni && (blok.baslangic === 1 && oncekiAySonGunRaporMu);
     var odenenGunSayisi = devamEden? 0 : (blokUzunluk >= 3? 2 : 0);
     raporOdenenGun += odenenGunSayisi;
     var sayac = 0;

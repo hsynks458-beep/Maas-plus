@@ -173,6 +173,11 @@ function takvimOlustur() {
       tip = 'ucretsiz';
     }
 
+    if (tip === 'rapor-yeni') {
+      saatBilgi = 'Yeni';
+      tip = 'rapor';
+    }
+
     if (!tip) {
       if (buAyResmi.indexOf(g)!== -1) {
         tip = 'resmi-bos';
@@ -299,6 +304,26 @@ function gunSec(gun) {
             modalKapat();
           }
         }, '7.5', 'Ücretsiz İzin');
+      } else if (t.kod === 'rapor' && seciliGun === 1) {
+        // Ayın 1. günü raporlu işaretleniyor: önceki ayın son günü de raporluysa,
+        // bu tek bir devam eden rapor mu yoksa alakasız yeni bir rapor mu diye sor.
+        var yil2 = window.aktifYil || new Date().getFullYear();
+        var ay2 = typeof window.aktifAy!== 'undefined'? window.aktifAy : new Date().getMonth();
+        var oncekiAy2 = ay2 - 1, oncekiYil2 = yil2;
+        if (oncekiAy2 < 0) { oncekiAy2 = 11; oncekiYil2 = yil2 - 1; }
+        var oncekiKey2 = oncekiYil2 + '-' + (oncekiAy2 + 1);
+        var oncekiAyTakvim2 = (window.takvimData && window.takvimData[oncekiKey2]) || {};
+        var oncekiAySonGun2 = new Date(oncekiYil2, oncekiAy2 + 1, 0).getDate();
+        var oncekiTip2 = oncekiAyTakvim2[oncekiAySonGun2];
+        var oncekiRaporMu2 = oncekiTip2 === 'rapor' || oncekiTip2 === 'rapor-yeni';
+        if (oncekiRaporMu2) {
+          modalKapat();
+          sikConfirm('Önceki ayın son günü de raporlu görünüyor.\n\nBu rapor ÖNCEKİ AYDAN DEVAM mı ediyor? (İlk 2 gün işveren ödemesi hakkı önceki ayda kullanılmış sayılır)\n\nDevam ediyorsa "Onayla", alakasız/yeni bir raporsa "İptal" seç.', function(devamMi){
+            tipAta(devamMi? 'rapor' : 'rapor-yeni');
+          }, 'Rapor Devam mı, Yeni mi?');
+        } else {
+          tipAta('rapor');
+        }
       } else {
         tipAta(t.kod);
       }
